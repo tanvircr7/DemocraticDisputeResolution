@@ -21,10 +21,9 @@ const { getNamedAccounts, deployments, ethers, network } = require("hardhat")
               it("initializes the raffle contract", async function () {
                   // Ideally our tests have just 1 assert per it
                   const raffleState = await raffle.getRaffleState()
-                  const interval = raffle.getInterval()
+                  const interval = await raffle.getInterval()
                   assert.equal(raffleState.toString(), "0")
-                  //   assert.equal(interval.toString(), networkConfig[chainId]["interval"])
-                  console.log("%s", interval)
+
                   assert.equal(interval.toString(), networkConfig[chainId]["interval"])
               })
           })
