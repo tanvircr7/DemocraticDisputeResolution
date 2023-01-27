@@ -7,6 +7,8 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 // ./interfaces/AutomationCompatibleInterface.sol
 import "@chainlink/contracts/src/v0.8/AutomationCompatible.sol";
 
+import "hardhat/console.sol";
+
 error Raffle__NotEnoughETHEntered();
 error Raffle__TransferFailed();
 error Raffle__NotOpen();
@@ -63,6 +65,7 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
         i_callbackGasLimit = callbackGasLimit;
         s_raffleState = RaffleState.OPEN;
         s_lastTimeStamp = block.timestamp;
+        console.log("interval -> %d", interval);
         i_interval = interval;
         // reset the players
         // s_players = new address payable[](0);
@@ -190,5 +193,10 @@ contract Raffle is VRFConsumerBaseV2, AutomationCompatibleInterface {
 
     function getRequestConfirmations() public pure returns (uint256) {
         return REQUEST_CONFIRMATIONS;
+    }
+
+    function getInterval() public view returns (uint256) {
+        console.log("get interval return %d", i_interval);
+        return i_interval;
     }
 }

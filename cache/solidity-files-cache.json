@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/home/tanvir/hh-fcc/hardhat-smartcontract-lottery-fcc/contracts/Raffle.sol": {
-      "lastModificationDate": 1671608413618,
-      "contentHash": "1bd9a4b62a3d4d18bfe590578d01ff79",
+      "lastModificationDate": 1674815100032,
+      "contentHash": "209b85ba53fc5f675383be70c39a4bb4",
       "sourceName": "contracts/Raffle.sol",
       "solcConfig": {
         "version": "0.8.17",
@@ -38,7 +38,8 @@
       "imports": [
         "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol",
         "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol",
-        "@chainlink/contracts/src/v0.8/AutomationCompatible.sol"
+        "@chainlink/contracts/src/v0.8/AutomationCompatible.sol",
+        "hardhat/console.sol"
       ],
       "versionPragmas": [
         "^0.8.7"
@@ -389,6 +390,48 @@
         "^0.8.0"
       ],
       "artifacts": []
+    },
+    "/home/tanvir/hh-fcc/hardhat-smartcontract-lottery-fcc/node_modules/hardhat/console.sol": {
+      "lastModificationDate": 1670944014709,
+      "contentHash": "4ff3cd2f6272c9a6516e9ee4f2b967d3",
+      "sourceName": "hardhat/console.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "devdoc",
+                "userdoc",
+                "storageLayout",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">= 0.4.22 <0.9.0"
+      ],
+      "artifacts": [
+        "console"
+      ]
     }
   }
 }
