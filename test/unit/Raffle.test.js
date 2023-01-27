@@ -1,5 +1,5 @@
 const { inputToConfig } = require("@ethereum-waffle/compiler")
-const { assert } = require("chai")
+const { assert, expect } = require("chai")
 const { developmentChains, networkConfig } = require("../../helper-hardhat-config")
 const { getNamedAccounts, deployments, ethers, network } = require("hardhat")
 
@@ -25,6 +25,14 @@ const { getNamedAccounts, deployments, ethers, network } = require("hardhat")
                   assert.equal(raffleState.toString(), "0")
 
                   assert.equal(interval.toString(), networkConfig[chainId]["interval"])
+              })
+          })
+
+          describe("enter raffle", async function () {
+              it("it reverts when you don't pay enough", async function () {
+                  await expect(raffle.enterRaffle()).to.be.revertedWith(
+                      "Raffle__NotEnoughETHEntered"
+                  )
               })
           })
       })
