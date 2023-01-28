@@ -5,7 +5,7 @@ const { getNamedAccounts, deployments, ethers, network } = require("hardhat")
 
 !developmentChains.includes(network.name)
     ? describe.skip
-    : describe("Raffle Unit Tests", async function () {
+    : describe("Raffle Unit Tests", function () {
           let raffle, vrfCoordinatorV2Mock, raffleEntranceFee, deployer, interval
           const chainId = network.config.chainId
 
@@ -19,7 +19,7 @@ const { getNamedAccounts, deployments, ethers, network } = require("hardhat")
               interval = await raffle.getInterval()
           })
 
-          describe("constructor", async function () {
+          describe("constructor", function () {
               it("initializes the raffle contract", async function () {
                   // Ideally our tests have just 1 assert per it
                   const raffleState = await raffle.getRaffleState()
@@ -29,7 +29,7 @@ const { getNamedAccounts, deployments, ethers, network } = require("hardhat")
               })
           })
 
-          describe("enter raffle", async function () {
+          describe("enter raffle", function () {
               it("it reverts when you don't pay enough", async function () {
                   await expect(raffle.enterRaffle()).to.be.revertedWith(
                       "Raffle__NotEnoughETHEntered"
@@ -63,7 +63,7 @@ const { getNamedAccounts, deployments, ethers, network } = require("hardhat")
               })
           })
 
-          describe("checkUpkeep", async function () {
+          describe("checkUpkeep", function () {
               it("returns false if people haven't sent any ETH", async function () {
                   await network.provider.send("evm_increaseTime", [interval.toNumber() + 1])
                   await network.provider.send("evm_mine", [])
@@ -93,6 +93,48 @@ const { getNamedAccounts, deployments, ethers, network } = require("hardhat")
                   await network.provider.request({ method: "evm_mine", params: [] })
                   const { upkeepNeeded } = await raffle.callStatic.checkUpkeep("0x") // upkeepNeeded = (timePassed && isOpen && hasBalance && hasPlayers)
                   assert(upkeepNeeded)
+              })
+          })
+
+          describe("performUpkeep", function () {
+              it("it can only run if checkUpkeep is true", async function () {
+                  await raffle.enterRaffle({ value: raffleEntranceFee })
+                  await network.provider.send("evm_increaseTime", [interval.toNumber() + 1])
+                  await network.provider.send("evm_mine", [])
+                  const tx = await raffle.performUpkeep([])
+                  assert(tx)
+              })
+              it("reverts when checkUpkeep is false", async function () {
+                  await expect(raffle.performUpkeep([])).to.be.revertedWith(
+                      "Raffle__UpkeepNotNeeded"
+                  )
+              })
+              it("updates the raffle state, emits and event and calls vrfCoordinator", async function () {
+                  await raffle.enterRaffle({ value: raffleEntranceFee })
+                  await network.provider.send("evm_increaseTime", [interval.toNumber() + 1])
+                  await network.provider.send("evm_mine", [])
+                  const txResponse = await raffle.performUpkeep([])
+                  const txReceipt = await txResponse.wait(1)
+                  const requestId = txReceipt.events[1].args.requestId
+                  const raffleState = await raffle.getRaffleState()
+                  assert(requestId.toString() > "0")
+                  assert(raffleState.toString() == "1")
+              })
+          })
+
+          describe("fulfillRandomWords", function () {
+              beforeEach(async function () {
+                  await raffle.enterRaffle({ value: raffleEntranceFee })
+                  await network.provider.send("evm_increaseTime", [interval.toNumber() + 1])
+                  await network.provider.send("evm_mine", [])
+              })
+              it("can only be called after perfromUpkeep", async function () {
+                  await expect(
+                      vrfCoordinatorV2Mock.fulfillRandomWords(0, raffle.address)
+                  ).to.be.revertedWith("nonexistent request")
+                  await expect(
+                      vrfCoordinatorV2Mock.fulfillRandomWords(1, raffle.address)
+                  ).to.be.revertedWith("nonexistent request")
               })
           })
       })
