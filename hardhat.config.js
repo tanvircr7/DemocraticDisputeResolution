@@ -57,6 +57,6 @@ module.exports = {
         apiKey: ETHERSCAN_API_KEY,
     },
     mocha: {
-        timeout: 200000,
+        timeout: 1000000,
     },
 }

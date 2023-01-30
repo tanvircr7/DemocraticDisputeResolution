@@ -33,7 +33,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     const callbackGasLimit = networkConfig[chainId]["callbackGasLimit"]
     const interval = networkConfig[chainId]["interval"]
 
-    const arguments = [
+    const args = [
         vrfCoordinatorV2Address,
         entranceFee,
         gasLane,
@@ -44,12 +44,16 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
     const raffle = await deploy("Raffle", {
         from: deployer,
-        args: arguments,
+        args: args,
         log: true,
         waitConfirmations: network.config.blockConfirmations || 1,
     })
 
-    await vrfCoordinatorV2Mock.addConsumer(subscriptionId, raffle.address)
+    // Ensure the Raffle contract is a valid consumer of the VRFCoordinatorV2Mock contract.
+    if (developmentChains.includes(network.name)) {
+        const vrfCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock")
+        await vrfCoordinatorV2Mock.addConsumer(subscriptionId, raffle.address)
+    }
 
     // Verify the deployment
     if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
